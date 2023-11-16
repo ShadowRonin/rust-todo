@@ -1,13 +1,14 @@
 # Overview
 
-Tiny todo app to get better at rust.
+Tiny todo app to practice rust.
 
-Rust stack based on [NoBoilerplate](https://www.youtube.com/@NoBoilerplate)'s [stack](https://www.youtube.com/watch?v=pocWrUj68tU).
+Rust stack based on [NoBoilerplate](https://www.youtube.com/@NoBoilerplate)'s [stack](https://www.youtube.com/watch?v=pocWrUj68tU). Will server a webapp via htmx.
 
 ## Todo
 - add UI via [htmx](https://htmx.org/)
 - Setup clippy defaults or script
     - that way dont have to specify all the flags
+- improve error handling? everything should use Eyre
 
 ## Crates and tools
 - [Tokio](https://tokio.rs/); async runtime
