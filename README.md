@@ -9,17 +9,20 @@ Rust stack based on [NoBoilerplate](https://www.youtube.com/@NoBoilerplate)'s [s
 
 - [Color-eyre](https://docs.rs/color-eyre/latest/color_eyre/); colorful errors
 - [Bacon](https://github.com/Canop/bacon); background code checker?
+- [Poem](https://github.com/poem-web/poem); web framework
+- [Poem-openapi](https://docs.rs/poem-openapi/latest/poem_openapi/); open api
 
 ---below still need to be added---
 
 - [sqlx](https://docs.rs/sqlx/latest/sqlx/); sql integration with compiler time type checking
-- [Poem-openapi](https://docs.rs/poem-openapi/latest/poem_openapi/); open api
 - [Chrono](https://crates.io/crates/chrono); Datetime
 
-- MySql
+- MySql, using Beekeper Studio for a client
 - 
 
 ## commands?
+run w/ watch `cargo watch -x run`
+
 Lint
 `
 cargo clippy --fix -- \
