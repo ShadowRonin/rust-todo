@@ -27,3 +27,8 @@ cargo clippy --fix -- \
 -W clippy::expect_used
 `
 Set up defaults so we dont have to specify all these flags?
+
+## Resources
+- NoBoilerplate
+    - [build a lightsaber](https://github.com/0atman/noboilerplate/blob/main/scripts/06-build-your-rust-lightsaber.md)
+    - [stack](https://github.com/0atman/noboilerplate/blob/main/scripts/30-poem.md)
