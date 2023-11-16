@@ -1,5 +1,5 @@
 use chrono::{DateTime, Local};
-use sqlx::{MySqlPool};
+use sqlx::MySqlPool;
 
 use serde::{Serialize, Deserialize};
 
