@@ -12,13 +12,9 @@ Rust stack based on [NoBoilerplate](https://www.youtube.com/@NoBoilerplate)'s [s
 - [Poem](https://github.com/poem-web/poem); web framework
 - [Poem-openapi](https://docs.rs/poem-openapi/latest/poem_openapi/); open api
 - [sqlx](https://docs.rs/sqlx/latest/sqlx/); sql integration with compiler time type checking
-
----below still need to be added---
-
 - [Chrono](https://crates.io/crates/chrono); Datetime
 
-- MySql, using Beekeper Studio for a client
-- 
+- MySql via Docker Compose, using Beekeper Studio for a client
 
 ## commands?
 run w/ watch `cargo watch -x run`

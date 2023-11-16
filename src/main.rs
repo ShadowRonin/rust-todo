@@ -1,4 +1,5 @@
-use sqlx::MySqlPool;
+use chrono::{DateTime, Local};
+use sqlx::{MySqlPool};
 
 use serde::{Serialize, Deserialize};
 
@@ -22,12 +23,27 @@ use poem_openapi::{
     param::Path,
 };
 
+#[derive(Clone, Debug, Deserialize, Object, Serialize)]
+struct TodoNew {
+    title: String,
+    description: Option<String>,
+}
+
+#[derive(Clone, Debug, Deserialize, Object, Serialize)]
+struct Todo {
+    id: u64,
+    title: String,
+    description: Option<String>,
+    created_at: DateTime<Local>,
+    updated_at: DateTime<Local>,
+}
+
 struct Api;
 
 #[OpenApi]
 impl Api {
     #[oai(path = "/todo", method = "post")]
-    async fn create_todo(&self, pool: Data<&MySqlPool>, Json(todo): Json<Todo>) -> Result<Json<u64>> {
+    async fn create_todo(&self, pool: Data<&MySqlPool>, Json(todo): Json<TodoNew>) -> Result<Json<u64>> {
         let id = sqlx::query_as!(
 	        Todo, 
 	        "INSERT INTO todo (title, description) values (?, ?)",
@@ -46,7 +62,7 @@ impl Api {
     async fn get_todo(&self, pool: Data<&MySqlPool>, Path(id): Path<u64>) -> Result<Json<Todo>> {
         let todo = sqlx::query_as!(
 	        Todo, 
-	        "SELECT id, title, description FROM todo WHERE id = ?",
+	        "SELECT * FROM todo WHERE id = ?",
             id
 	    )
 		.fetch_one(pool.0)
@@ -61,7 +77,7 @@ impl Api {
     async fn get_todos(&self, pool: Data<&MySqlPool>) -> Result<Json<Vec<Todo>>> {
         let todos = sqlx::query_as!(
 	        Todo, 
-	        "SELECT id, title, description FROM todo"
+	        "SELECT * FROM todo"
 	    )
 		.fetch_all(pool.0)
 		.await
@@ -92,11 +108,4 @@ async fn main() -> eyre::Result<()> {
         .await?;
 
     Ok(())
-}
-
-#[derive(Clone, Debug, Deserialize, Object, Serialize)]
-struct Todo {
-    id: u64,
-    title: String,
-    description: Option<String>,
 }
