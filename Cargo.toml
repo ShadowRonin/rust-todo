@@ -12,4 +12,5 @@ poem = "1.3.58"
 poem-openapi = { version = "3.0.5", features = ["openapi-explorer"] }
 serde = {version = "1.0.192", features = ["derive"]}
 serde_json = "1.0.108"
+sqlx = { version = "0.7.2", features = ["runtime-tokio", "mysql", "time"] }
 tokio = { version = "1", features = ["full"] }

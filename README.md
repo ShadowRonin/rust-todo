@@ -11,10 +11,10 @@ Rust stack based on [NoBoilerplate](https://www.youtube.com/@NoBoilerplate)'s [s
 - [Bacon](https://github.com/Canop/bacon); background code checker?
 - [Poem](https://github.com/poem-web/poem); web framework
 - [Poem-openapi](https://docs.rs/poem-openapi/latest/poem_openapi/); open api
+- [sqlx](https://docs.rs/sqlx/latest/sqlx/); sql integration with compiler time type checking
 
 ---below still need to be added---
 
-- [sqlx](https://docs.rs/sqlx/latest/sqlx/); sql integration with compiler time type checking
 - [Chrono](https://crates.io/crates/chrono); Datetime
 
 - MySql, using Beekeper Studio for a client
@@ -39,6 +39,11 @@ Bacon, background code checker, keep open in a terminal
 
 Start db `docker compose up`
 Note: make sure docker desktop is running on windows first
+
+### Db with sqlx
+[cheat sheet](https://github.com/launchbadge/sqlx/blob/main/sqlx-cli/README.md)
+create db: `sqlx database create`
+create migration: `sqlx migrate add <name>`
 
 ## Resources
 - NoBoilerplate

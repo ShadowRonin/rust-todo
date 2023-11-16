@@ -1,10 +1,18 @@
-use eyre::Result;
+use sqlx::MySqlPool;
 use tokio::time::{sleep, Duration};
 use serde::{Serialize, Deserialize};
 
+// TODO: really should be using eyre::Result for everything...
+// use eyre::Result;
+
 use poem::{
     listener::TcpListener, 
-    Route, 
+    Route,
+    web::Data, 
+    middleware::AddData,
+    EndpointExt,
+    error::InternalServerError,
+    Result,
 };
 
 use poem_openapi::{
@@ -12,7 +20,7 @@ use poem_openapi::{
     OpenApiService,
     payload::Json,
     Object,
-    param::Path
+    param::Path,
 };
 
 struct Api;
@@ -20,53 +28,65 @@ struct Api;
 #[OpenApi]
 impl Api {
     #[oai(path = "/todo", method = "post")]
-    async fn create_todo(&self, Json(todo): Json<Todo>) {
-        sleep(Duration::from_millis(100)).await;
-    
-        println!("New todo: {:?}", todo);
+    async fn create_todo(&self, pool: Data<&MySqlPool>, Json(todo): Json<Todo>) -> Result<Json<u64>> {
+        let id = sqlx::query_as!(
+	        Todo, 
+	        "INSERT INTO todo (title, description) values (?, ?)",
+            todo.title,
+            todo.description,
+	    )
+		.execute(pool.0)
+		.await
+		.map_err(InternalServerError)?
+		.last_insert_id();
+
+        Ok(Json(id))
     }
 
     #[oai(path = "/todo/:id", method = "get")]
-    async fn get_todo(&self, Path(id): Path<u64>) -> Json<Todo> {
-        sleep(Duration::from_millis(100)).await;
+    async fn get_todo(&self, pool: Data<&MySqlPool>, Path(id): Path<u64>) -> Result<Json<Todo>> {
+        let todo = sqlx::query_as!(
+	        Todo, 
+	        "SELECT id, title, description FROM todo WHERE id = ?",
+            id
+	    )
+		.fetch_one(pool.0)
+		.await
+        // TODO: error should be logged by eyre
+		.map_err(InternalServerError)?;
     
-        Json(Todo {
-            id: 1,
-            title: "Example".to_owned(),
-            description: "this is an example".to_owned()
-        })
+        Ok(Json(todo))
     }
 
     #[oai(path = "/todo", method = "get")]
-    async fn get_todos(&self) -> Json<Vec<Todo>> {
-        sleep(Duration::from_millis(100)).await;
+    async fn get_todos(&self, pool: Data<&MySqlPool>) -> Result<Json<Vec<Todo>>> {
+        let todos = sqlx::query_as!(
+	        Todo, 
+	        "SELECT id, title, description FROM todo"
+	    )
+		.fetch_all(pool.0)
+		.await
+        // TODO: error should be logged by eyre
+		.map_err(InternalServerError)?;
     
-        Json(vec!(
-            Todo {
-                id: 1,
-                title: "Example".to_owned(),
-                description: "this is an example".to_owned()
-            },
-            Todo {
-                id: 2,
-                title: "Example 2".to_owned(),
-                description: "this is another example".to_owned()
-            }
-        ))
+        Ok(Json(todos))
     }
 }
 
 
 #[tokio::main]
-async fn main() -> Result<()> {
+async fn main() -> eyre::Result<()> {
     // make run time errors colorful
     color_eyre::install()?;
 
+    let pool = 
+	    MySqlPool::connect("mysql://myuser:mypassword@localhost/mydatabase").await?;
     let api_service = OpenApiService::new(Api, "Manage Todos", "1.0").server("http://127.0.0.1:3000/api");
     let ui = api_service.openapi_explorer();
     let app = Route::new()
         .nest("/api", api_service)
-        .nest("/", ui);
+        .nest("/", ui)
+        .data(pool);
 
     poem::Server::new(TcpListener::bind("127.0.0.1:3000"))
         .run(app)
@@ -79,5 +99,5 @@ async fn main() -> Result<()> {
 struct Todo {
     id: u64,
     title: String,
-    description: String,
+    description: Option<String>,
 }
