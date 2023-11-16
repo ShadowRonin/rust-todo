@@ -1,48 +1,47 @@
-Basic todo app using HTMX and rust.
+# Overview
+
+Tiny todo app to get better at rust.
 
 Rust stack based on [NoBoilerplate](https://www.youtube.com/@NoBoilerplate)'s [stack](https://www.youtube.com/watch?v=pocWrUj68tU).
 
-## Libraries and the like used
-- [Tokio](https://tokio.rs/); runtime for async
-- [Eyre](https://docs.rs/eyre/latest/eyre/); unified Errors/Result types
-- [Serde](https://serde.rs/); serialize/deserialize
+## Todo
+- add UI via [htmx](https://htmx.org/)
+- Setup clippy defaults or script
+    - that way dont have to specify all the flags
 
+## Crates and tools
+- [Tokio](https://tokio.rs/); async runtime
+- [Eyre](https://docs.rs/eyre/latest/eyre/); unified Errors/Result types
 - [Color-eyre](https://docs.rs/color-eyre/latest/color_eyre/); colorful errors
-- [Bacon](https://github.com/Canop/bacon); background code checker?
+- [Serde](https://serde.rs/); serialize/deserialize
 - [Poem](https://github.com/poem-web/poem); web framework
 - [Poem-openapi](https://docs.rs/poem-openapi/latest/poem_openapi/); open api
 - [sqlx](https://docs.rs/sqlx/latest/sqlx/); sql integration with compiler time type checking
 - [Chrono](https://crates.io/crates/chrono); Datetime
-
+- [Bacon](https://github.com/Canop/bacon); background code checker, keep open in another terminal
 - MySql via Docker Compose, using Beekeper Studio for a client
 
-## commands?
-run w/ watch `cargo watch -x run`
+## Commands
 
-Lint
-`
+- run w/ watch: `cargo watch -x run`
+- Lint: `
 cargo clippy --fix -- \
 -W clippy::pedantic \
 -W clippy::nursery \
 -W clippy::unwrap_used \
 -W clippy::expect_used
 `
-Set up defaults so we dont have to specify all these flags?
-
-
-Bacon, background code checker, keep open in a terminal
+- Bacon, background code checker, keep open in a terminal
 `bacon`
-
-Start db `docker compose up`
-Note: make sure docker desktop is running on windows first
-
-### Db with sqlx
-[cheat sheet](https://github.com/launchbadge/sqlx/blob/main/sqlx-cli/README.md)
-create db: `sqlx database create`
-create migration: `sqlx migrate add <name>`
+- DB
+    - Start: `docker compose up`
+        - Note: make sure docker desktop is running on windows first
+    - add migration: `sqlx migrate add <name>`
+    - migrate: `sqlx migrate run`
+    - [sqlx cli cheat sheet](https://github.com/launchbadge/sqlx/blob/main/sqlx-cli/README.md)
 
 ## Resources
 - NoBoilerplate
     - [build a lightsaber](https://github.com/0atman/noboilerplate/blob/main/scripts/06-build-your-rust-lightsaber.md)
     - [stack](https://github.com/0atman/noboilerplate/blob/main/scripts/30-poem.md)
-    - Let's Get Rusty's [serde explanation](https://github.com/letsgetrusty/json_parsing_example/blob/master/src/main.rs)
+- Let's Get Rusty's [serde explanation](https://github.com/letsgetrusty/json_parsing_example/blob/master/src/main.rs)
