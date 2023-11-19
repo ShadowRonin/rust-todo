@@ -3,9 +3,6 @@ use sqlx::MySqlPool;
 
 use serde::{Serialize, Deserialize};
 
-// TODO: really should be using eyre::Result for everything...
-// use eyre::Result;
-
 use poem::{
     listener::TcpListener, 
     Route,
@@ -67,7 +64,6 @@ impl Api {
 	    )
 		.fetch_one(pool.0)
 		.await
-        // TODO: error should be logged by eyre
 		.map_err(InternalServerError)?;
     
         Ok(Json(todo))
@@ -81,7 +77,6 @@ impl Api {
 	    )
 		.fetch_all(pool.0)
 		.await
-        // TODO: error should be logged by eyre
 		.map_err(InternalServerError)?;
     
         Ok(Json(todos))

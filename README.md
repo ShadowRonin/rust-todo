@@ -8,7 +8,6 @@ Rust stack based on [NoBoilerplate](https://www.youtube.com/@NoBoilerplate)'s [s
 - add UI via [htmx](https://htmx.org/)
 - Setup clippy defaults or script
     - that way dont have to specify all the flags
-- improve error handling? everything should use Eyre
 - securely store sql user/pass
 - deploy somewhere, RasPi?
 
