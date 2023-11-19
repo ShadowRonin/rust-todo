@@ -9,6 +9,8 @@ Rust stack based on [NoBoilerplate](https://www.youtube.com/@NoBoilerplate)'s [s
 - Setup clippy defaults or script
     - that way dont have to specify all the flags
 - improve error handling? everything should use Eyre
+- securely store sql user/pass
+- deploy somewhere, RasPi?
 
 ## Crates and tools
 - [Tokio](https://tokio.rs/); async runtime
