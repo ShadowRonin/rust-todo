@@ -1,24 +1,33 @@
+use askama::Template;
 use chrono::{DateTime, Local};
+use mime::Mime;
 use sqlx::MySqlPool;
 
 use serde::{Serialize, Deserialize};
 
+use std::{env, path::PathBuf};
+
 use poem::{
     listener::TcpListener, 
     Route,
-    web::Data,
+    web::{Data, Accept},
     EndpointExt,
     error::InternalServerError,
     Result,
+    endpoint::StaticFileEndpoint, 
+    IntoResponse,
+    Response,
 };
 
 use poem_openapi::{
     OpenApi, 
     OpenApiService,
-    payload::Json,
+    payload::{Json, Html},
     Object,
-    param::Path,
+    param::Path, ApiResponse,
 };
+
+pub mod templates;
 
 #[derive(Clone, Debug, Deserialize, Object, Serialize)]
 struct TodoNew {
@@ -27,12 +36,12 @@ struct TodoNew {
 }
 
 #[derive(Clone, Debug, Deserialize, Object, Serialize)]
-struct Todo {
-    id: u64,
-    title: String,
-    description: Option<String>,
-    created_at: DateTime<Local>,
-    updated_at: DateTime<Local>,
+pub struct Todo {
+    pub id: u64,
+    pub title: String,
+    pub description: Option<String>,
+    pub created_at: DateTime<Local>,
+    pub updated_at: DateTime<Local>,
 }
 
 struct Api;
@@ -70,7 +79,7 @@ impl Api {
     }
 
     #[oai(path = "/todo", method = "get")]
-    async fn get_todos(&self, pool: Data<&MySqlPool>) -> Result<Json<Vec<Todo>>> {
+    async fn get_todos(&self, pool: Data<&MySqlPool>, accept: Accept) -> Result<TodosResult> {
         let todos = sqlx::query_as!(
 	        Todo, 
 	        "SELECT * FROM todo"
@@ -78,11 +87,30 @@ impl Api {
 		.fetch_all(pool.0)
 		.await
 		.map_err(InternalServerError)?;
-    
-        Ok(Json(todos))
+
+        if accept.0.iter().any(|x| x.subtype().as_str() == "html") {
+            let todo = todos.first().unwrap();
+
+            let template = templates::TodoRow {
+                title: todo.title.as_str(),
+                desc: todo.description.as_ref().map(|x| x.as_str()).unwrap_or(""),
+            };
+
+            Ok(TodosResult::Html(Html(template.render().unwrap())))
+        }
+        else {
+            Ok(TodosResult::Json(Json(todos)))
+        }
     }
 }
 
+#[derive(ApiResponse, Debug, Clone)]
+pub enum TodosResult {
+    #[oai(status = 200)]
+    Json(Json<Vec<Todo>>),
+    #[oai(status = 200)]
+    Html(Html<String>),
+}
 
 #[tokio::main]
 async fn main() -> eyre::Result<()> {
@@ -91,11 +119,14 @@ async fn main() -> eyre::Result<()> {
 
     let pool = 
 	    MySqlPool::connect("mysql://myuser:mypassword@localhost/mydatabase").await?;
-    let api_service = OpenApiService::new(Api, "Manage Todos", "1.0").server("http://127.0.0.1:3000/api");
-    let ui = api_service.openapi_explorer();
+    let api_service = OpenApiService::new(Api, "Manage Todos", "1.0").server("http://localhost:3000/api");
+    let docs = api_service.openapi_explorer();
     let app = Route::new()
         .nest("/api", api_service)
-        .nest("/", ui)
+        .nest("/docs", docs)
+        .nest("/", 
+        StaticFileEndpoint::new("./assets/index.html")
+        )
         .data(pool);
 
     poem::Server::new(TcpListener::bind("127.0.0.1:3000"))
@@ -104,3 +135,6 @@ async fn main() -> eyre::Result<()> {
 
     Ok(())
 }
+
+
+
